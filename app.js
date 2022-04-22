@@ -33,7 +33,27 @@ app.get('/login', (req, res) => {
 
 // ユーザー認証
 app.post('/login', (req, res) => {
-    res.redirect('/record');
+    const email = req.body.email; 
+
+    connection.query(
+        'SELECT * FROM users WHERE email = ?',
+        [email],
+        (error, results) => {
+            if (results.length > 0) {
+                console.log(req.body.password);
+                console.log(results[0].password);
+                if (req.body.password === results[0].password) { 
+                    console.log("認証に成功しました");
+                    res.redirect("/record");
+                } else {
+                    console.log("認証に失敗しました");
+                    res.redirect("/login");
+                }
+            } else {
+                res.redirect("/login")
+            }
+        }
+    );
 });
 
 
