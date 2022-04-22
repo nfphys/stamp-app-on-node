@@ -1,7 +1,7 @@
 {
   "name": "stamp-app",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -13,7 +13,8 @@
     "express-session": "^1.17.2",
     "jquery": "^3.6.0",
     "jsdom": "^19.0.0",
-    "mysql": "^2.18.1"
+    "mysql": "^2.18.1",
+    "nodeplotlib": "^1.0.1"
   },
   "description": ""
 }

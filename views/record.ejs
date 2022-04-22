@@ -5,8 +5,8 @@
     <meta charset="utf-8">
     <title>STAMP APP</title>
     <script src="/send_url.js"></script>
-    <script src="./jquery-3.6.0.min.js"></script>
     <script src="./script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
 </head>
 
 <body>
@@ -14,12 +14,11 @@
     <%- include('header') %>
 
     <div class="main">
-        <!--現在時刻
+        <!--現在時刻-->
         <div id="current-time-wrapper">
             <h2>現在時刻</h2>
             <p id="current-time"></p>
         </div>
-        -->
 
         <!--勤務状況(勤務外、勤務中、休憩中のいずれか)-->
         <div id="current-state-wrapper">
@@ -87,12 +86,12 @@
             -->
 
             <!--出勤-->
-            <form action="/start_work" method="post">
+            <form action="/start_work" method="post" style="display: inline">
                 <input type="submit" value="出勤">
             </form>
 
             <!--退勤-->
-            <form action="/finish_work" method="post">
+            <form action="/finish_work" method="post" style="display: inline">
                 <input type="submit" value="退勤">
             </form>
         </div>
@@ -110,47 +109,78 @@
         </div>
         -->
 
-        <!--履歴-->
+        <!--過去の勤務状況-->
         <div class="table-wrapper">
             <h2 class="table-label">過去の勤務状況</h2>
-            <div class="table-head">
-                <span class="day-column">
-                    日付
-                </span>
-                <span class="working-hours-column">
-                    勤務時間
-                </span>
-            </div>
 
-            <ul class="table-body">
-                <% work_data.forEach((datum) => { 
-                    function twoDigit(num) {
-                        let ret;
-                        if( num < 10 ) 
-                            ret = "0" + num; 
-                        else 
-                            ret = num; 
-                        return ret;
-                    }
-                    let date = datum.date;
-                    let year  =          date.getFullYear();
-                    let month = twoDigit(date.getMonth() + 1);
-                    let day   = twoDigit(date.getDate());
-                    let date_string = year + "/" + month + "/" + day;
-                    %>
-                    <li>
-                        <span class="day-column">
-                            <%= date_string %>
-                        </span>
-                        <span class="working-hours-column">
-                            <%= datum.working_hours %>
-                        </span>
-                        <form action="/delete/<%= datum.id %>" method="post" style="display: inline">
-                            <input type="submit" value="削除">
-                        </form>
-                    </li>
-                <% }); %>
-            </ul>
+            <% if (locals.isLoggedIn) { %>
+                
+                <div class="table-head">
+                    <span class="day-column">
+                        日付
+                    </span>
+                    <span class="working-hours-column">
+                        勤務時間
+                    </span>
+                </div>
+                <ul class="table-body">
+                    <% work_data.forEach((datum) => { 
+                        function twoDigit(num) {
+                            let ret;
+                            if( num < 10 ) 
+                                ret = "0" + num; 
+                            else 
+                                ret = num; 
+                            return ret;
+                        }
+                        let date = datum.date;
+                        let year  =          date.getFullYear();
+                        let month = twoDigit(date.getMonth() + 1);
+                        let day   = twoDigit(date.getDate());
+                        let date_string = year + "/" + month + "/" + day;
+                        if (datum.username === locals.username) { %>
+                            <li>
+                                <span class="day-column">
+                                    <%= date_string %>
+                                </span>
+                                <span class="working-hours-column">
+                                    <%= datum.working_hours %>
+                                </span>
+                                <form action="/delete/<%= datum.id %>" method="post" style="display: inline">
+                                    <input type="submit" value="削除">
+                                </form>
+                            </li>
+                        <% }
+                    }); %>
+                </ul>
+
+                <canvas id="sample1"></canvas>
+                <script>
+                    (function(){
+                        var ctx = document.getElementById("sample1");
+                        
+                        var data = {
+                            labels: ["4月", "5月", "6月", "7月", "8月"],
+                            datasets: [{
+                                label: '任天堂',
+                                data: [11433, 23510, 15943, 34212, 19841], //配列でデータをセット
+                                borderColor: 'rgba(255, 0, 0, 1)', //ボーダーの色
+                            }]
+                        };
+                        
+                        var options = {};
+                        var ex_chart = new Chart(ctx, {
+                            type: 'line', //折れ線グラフ
+                            data: data, //上記設定のデータ
+                            options: options
+                        });
+                    }());
+                </script>
+
+            <% } else { %>
+                <p>ログインしてください</p>
+            <% } %>
+            
         </div>
     </div>
 

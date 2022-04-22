@@ -117,7 +117,9 @@ app.get('/record', (req, res) => {
 
 // 出勤
 app.post('/start_work', (req, res) => {
-    if (req.session.startWorkTime === undefined) {
+    if (res.locals.isLoggedIn === false) {
+        console.log("まだログインしていません");
+    } else if (req.session.startWorkTime === undefined) {
         let date = new Date();
         req.session.startWorkTime = date.toLocaleString("ja");
     }
@@ -126,7 +128,9 @@ app.post('/start_work', (req, res) => {
 
 // 退勤
 app.post('/finish_work', (req, res) => {
-    if (req.session.startWorkTime === undefined) {
+    if (res.locals.isLoggedIn === false) {
+        console.log("まだログインしていません");
+    } else if (req.session.startWorkTime === undefined) {
         console.log("まだ出勤していません");
     } else if (req.session.finishWorkTime === undefined) {
         let date = new Date(); 
@@ -167,4 +171,5 @@ app.post('/delete/:id', (req, res) => {
 
 
 // サーバーを起動する
-app.listen(3000);
+var port = process.env.PORT || 3000;
+app.listen(port);

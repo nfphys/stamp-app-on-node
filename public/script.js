@@ -72,7 +72,7 @@ let workingHours = [0]; // 勤務時間(sec)
 let restHours = [0]; // 休憩時間(sec)
 
 // 現在時刻の表示
-setInterval('showClock("current-time")', 1000);
+setInterval('showClock("current-time")', 10);
 
 // 勤務時間の更新・表示
 setInterval('updateWorkingHours(currentState, workingHours, 1)', 1000);
