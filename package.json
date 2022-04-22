@@ -10,6 +10,7 @@
   "dependencies": {
     "ejs": "^3.1.6",
     "express": "^4.17.3",
+    "express-session": "^1.17.2",
     "jquery": "^3.6.0",
     "jsdom": "^19.0.0",
     "mysql": "^2.18.1"

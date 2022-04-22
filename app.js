@@ -9,6 +9,15 @@ const connection = mysql.createConnection({
     database: 'stamp_app'
 });
 
+const session = require('express-session');
+app.use(
+    session({
+        secret: 'my_secret_key',
+        resave: false,
+        saveUninitialized: false,
+    })
+)
+
 app.use(express.static('public'));
 app.use(express.urlencoded({extended: false})); // これがないと req.body が undefined になる
 
