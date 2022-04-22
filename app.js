@@ -30,6 +30,19 @@ function twoDigit(num) {
     return ret;
 }
 
+app.use((req, res, next) => {
+    if (req.session.userId === undefined) {
+        //console.log("ログインしていません");
+        res.locals.username = 'ゲスト';
+    } else {
+        //console.log("ログインしています");
+        res.locals.username = req.session.username;
+        const username = req.session.username;
+    }
+
+    next();
+});
+
 // トップページ
 app.get('/', (req, res) => {
     res.render('top.ejs');
@@ -49,13 +62,11 @@ app.post('/login', (req, res) => {
         [email],
         (error, results) => {
             if (results.length > 0) {
-                console.log(req.body.password);
-                console.log(results[0].password);
                 if (req.body.password === results[0].password) { 
-                    console.log("認証に成功しました");
+                    req.session.userId = results[0].id;
+                    req.session.username = results[0].username;
                     res.redirect("/record");
                 } else {
-                    console.log("認証に失敗しました");
                     res.redirect("/login");
                 }
             } else {
@@ -63,6 +74,13 @@ app.post('/login', (req, res) => {
             }
         }
     );
+});
+
+// ログアウト
+app.get('/logout', (req, res) => {
+    req.session.destroy((error) => {
+        res.redirect('/record');
+    });
 });
 
 
