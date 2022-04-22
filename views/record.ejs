@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>STAMP APP</title>
+    <script src="/send_url.js"></script>
+    <script src="./jquery-3.6.0.min.js"></script>
+    <script src="./script.js"></script>
+</head>
+
+<body>
+
+    <header>
+        <a class="header-logo" href="/" >STAMP APP</a>
+        <a href="/login">ログイン</a>
+    </header>
+
+    <div class="main">
+        <!--現在時刻-->
+        <div id="current-time-wrapper">
+            <h2>現在時刻</h2>
+            <p id="current-time"></p>
+        </div>
+
+        <!--勤務状況(勤務外、勤務中、休憩中のいずれか)-->
+        <div id="current-state-wrapper">
+            <h2>現在の状況</h2>
+            <p id="current-state">勤務外</p>
+        </div>
+
+        <!--勤務開始時刻-->
+        <div id="start-time-wrapper">
+            <h2>勤務開始時刻</h2>
+            <p id="start-time"></p>
+        </div>
+
+        <!--勤務終了時刻-->
+        <div id="finish-time-wrapper">
+            <h2>勤務終了時刻</h2>
+            <p id="finish-time"></p>
+        </div>
+
+        <!--本日の勤務時間-->
+        <div id="working-hours-wrapper">
+            <h2>本日の勤務時間</h2>
+            <p id="working-hours">00:00:00</p>
+        </div>
+
+        <!--本日の休憩時間-->
+        <div id="rest-hours-wrapper">
+            <h2>本日の休憩時間</h2>
+            <p id="rest-hours">00:00:00</p>
+        </div>
+
+        <!--打刻-->
+        <div class="btn-wrapper"> 
+            <h2>打刻</h2>
+            <!--出勤-->
+            <button type="button" class="btn" id="start-work" onclick="startWork();">
+                出勤
+            </button>
+
+            <!--退勤-->
+            <button type="button" class="btn" id="finish-work" onclick="finishWork();">
+                退勤
+            </button>
+
+            <!--休憩-->
+            <button type="button" class="btn" id="start-rest" onclick="startRest();">
+                休憩
+            </button>
+
+            <!--戻り-->
+            <button type="button" class="btn" id="finish-rest" onclick="finishRest();">
+                戻り
+            </button>
+
+            <!--リセット-->
+            <button type="button" class="btn" id="reset" onclick="reset();">
+                リセット
+            </button>
+        </div>
+
+        <!--登録フォーム-->
+        <div class="registration-form-wrapper">
+            <h2 class="form-label">登録フォーム</h2>
+            <form action="/registration" method="post" onSubmit="">
+                <label>
+                    勤務時間：
+                    <input type="text" name="workingHours" id="working-hours-input" readonly>
+                </label>
+                <input type="submit" value="登録する">
+            </form>
+        </div>
+
+        <!--履歴-->
+        <div class="table-wrapper">
+            <h2 class="table-label">過去の勤務状況</h2>
+            <div class="table-head">
+                <span class="day-column">
+                    日付
+                </span>
+                <span class="working-hours-column">
+                    勤務時間
+                </span>
+            </div>
+
+            <ul class="table-body">
+                <% work_data.forEach((datum) => { 
+                    function twoDigit(num) {
+                        let ret;
+                        if( num < 10 ) 
+                            ret = "0" + num; 
+                        else 
+                            ret = num; 
+                        return ret;
+                    }
+                    let date = datum.date;
+                    let year  =          date.getFullYear();
+                    let month = twoDigit(date.getMonth() + 1);
+                    let day   = twoDigit(date.getDate());
+                    let date_string = year + "/" + month + "/" + day;
+                    %>
+                    <li>
+                        <span class="day-column">
+                            <%= date_string %>
+                        </span>
+                        <span class="working-hours-column">
+                            <%= datum.working_hours %>
+                        </span>
+                        <form action="/delete/<%= datum.id %>" method="post" style="display: inline">
+                            <input type="submit" value="削除">
+                        </form>
+                    </li>
+                <% }); %>
+            </ul>
+        </div>
+    </div>
+
+</body>
+
+</html>
