@@ -34,10 +34,30 @@ app.use((req, res, next) => {
     if (req.session.userId === undefined) {
         //console.log("ログインしていません");
         res.locals.username = 'ゲスト';
+        res.locals.isLoggedIn = false;
     } else {
         //console.log("ログインしています");
         res.locals.username = req.session.username;
-        const username = req.session.username;
+        res.locals.isLoggedIn = true;
+    }
+
+    if (req.session.startWorkTime === undefined) {
+        //console.log("出勤していません");
+        res.locals.currentState = "出勤前"
+    } else {
+        //console.log("出勤しました");
+        res.locals.startedWork = true;
+        res.locals.startWorkTime = req.session.startWorkTime;
+        res.locals.currentState = "勤務中"
+
+        if (req.session.finishWorkTime === undefined) {
+            //console.log("退勤していません");
+        } else {
+            //console.log("退勤しました");
+            res.locals.finishedWork = true;
+            res.locals.finishWorkTime = req.session.finishWorkTime;
+            res.locals.currentState = "退勤済"
+        }
     }
 
     next();
@@ -95,6 +115,25 @@ app.get('/record', (req, res) => {
     )
 });
 
+// 出勤
+app.post('/start_work', (req, res) => {
+    if (req.session.startWorkTime === undefined) {
+        let date = new Date();
+        req.session.startWorkTime = date.toLocaleString("ja");
+    }
+    res.redirect('/record');
+});
+
+// 退勤
+app.post('/finish_work', (req, res) => {
+    if (req.session.startWorkTime === undefined) {
+        console.log("まだ出勤していません");
+    } else if (req.session.finishWorkTime === undefined) {
+        let date = new Date(); 
+        req.session.finishWorkTime = date.toLocaleString("ja");
+    }
+    res.redirect('/record');
+});
 
 // 登録
 app.post('/registration', (req, res) => {
