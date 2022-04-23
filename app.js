@@ -135,11 +135,39 @@ app.post('/finish_work', (req, res) => {
     } else if (req.session.finishWorkTime === undefined) {
         let date = new Date(); 
         req.session.finishWorkTime = date.toLocaleString("ja");
+
+        // 日付
+        let year  =          date.getFullYear();
+        let month = twoDigit(date.getMonth() + 1);
+        let day   = twoDigit(date.getDate());
+        let date_string = year + "-" + month + "-" + day;
+
+        // 勤務時間の計算
+        start  = Date.parse(req.session.startWorkTime)/1000;
+        finish = Date.parse(req.session.finishWorkTime)/1000;
+
+        temp = finish - start; 
+        let sec  = twoDigit(temp % 60);
+        temp = Math.floor(temp / 60); 
+        let min  = twoDigit(temp % 60);
+        temp = Math.floor(temp / 60); 
+        let hour = twoDigit(temp);
+        let workingHours = hour + ":" + min + ":" + sec;
+        console.log(workingHours);
+
+        connection.query(
+            'INSERT INTO work_data(date, working_hours, username) VALUES(?, ?, ?)', 
+            [date_string, workingHours, res.locals.username],
+            (error, results) => {
+            }
+        );
     }
+
     res.redirect('/record');
 });
 
 // 登録
+/*
 app.post('/registration', (req, res) => {
     let date  = new Date();
     let year  =          date.getFullYear();
@@ -155,6 +183,7 @@ app.post('/registration', (req, res) => {
         }
     );
 })
+*/
 
 // 削除
 app.post('/delete/:id', (req, res) => {
