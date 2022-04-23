@@ -166,25 +166,6 @@ app.post('/finish_work', (req, res) => {
     res.redirect('/record');
 });
 
-// 登録
-/*
-app.post('/registration', (req, res) => {
-    let date  = new Date();
-    let year  =          date.getFullYear();
-    let month = twoDigit(date.getMonth() + 1);
-    let day   = twoDigit(date.getDate());
-    let date_string = year + "-" + month + "-" + day;
-
-    connection.query(
-        'INSERT INTO work_data(date, working_hours) VALUES(?, ?)', 
-        [date_string, req.body.workingHours],
-        (error, results) => {
-            res.redirect('/record');
-        }
-    );
-})
-*/
-
 // 削除
 app.post('/delete/:id', (req, res) => {
     console.log(req.params.id);
