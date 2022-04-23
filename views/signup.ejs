@@ -16,6 +16,13 @@
             <h1><a href="/record">STAMP APP</a> </h1>
             <div class="panel">
                 <h2>新規登録</h2>
+                <% if (errors.length > 0) { %>
+                    <ul class="errors">
+                        <% errors.forEach(error => { %>
+                            <li><%= error %></li>
+                        <% }); %>
+                    </ul>
+                <% } %>
                 <form action="/signup" method="post">
                     <p>ユーザー名</p>
                     <input type="text" name="username">
