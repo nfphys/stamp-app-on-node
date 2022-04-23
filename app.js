@@ -104,6 +104,27 @@ app.get('/logout', (req, res) => {
 });
 
 
+// 新規登録
+app.get('/signup', (req, res) => {
+    res.render('signup.ejs');
+});
+
+app.post('/signup', (req, res) => {
+    const username = req.body.username;
+    const email    = req.body.email; 
+    const password = req.body.password; 
+
+    connection.query(
+        'INSERT INTO users (username, email, password) VALUES (?,?,?)',
+        [username, email, password],
+        (error, resultd) =>{
+            req.session.userId = results.insertId;
+            req.session.username = username;
+            res.redirect('/record');
+        }
+    )
+});
+
 
 // 記録ページ
 app.get('/record', (req, res) => {
