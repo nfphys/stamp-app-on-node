@@ -189,11 +189,15 @@ app.post('/signup', (req, res) => {
 
 // 記録ページ
 app.get('/record', (req, res) => {
-    today = new Date();
-    const year = today.getFullYear();
-    const month = today.getMonth() + 1;
-    const year_month = year + "-" + twoDigit(month);
-    //console.log(YM_today);
+    let year_month = "";
+    if (req.session.year_month === undefined) {
+        today = new Date();
+        const year = today.getFullYear();
+        const month = today.getMonth() + 1;
+        year_month = year + "-" + twoDigit(month);
+    } else {
+        year_month = req.session.year_month
+    }
 
     if (res.locals.isLoggedIn) {
         const username = res.locals.username;
@@ -277,20 +281,8 @@ app.post('/delete/:id', (req, res) => {
 
 // 過去の勤務状況を取得
 app.post('/history', (req, res) => {
-    console.log(req.body.year_month)
-    const year_month = req.body.year_month;
-    if (res.locals.isLoggedIn) {
-        const username = res.locals.username;
-        connection.query(
-            'SELECT * FROM work_data WHERE username=? && date>=? && date<=? ORDER BY id DESC', 
-            [username, year_month + "-01", year_month + "-31"],
-            (error, results) => {
-                res.render('record.ejs', {work_data: results, year_month: year_month});
-            }
-        )
-    } else {
-        res.render('record.ejs');
-    }
+    req.session.year_month = req.body.year_month;
+    res.redirect('/record');
 })
 
 

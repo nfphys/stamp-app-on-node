@@ -51,18 +51,33 @@
 
             <!--出勤-->
             <form action="/start_work" method="post" style="display: inline">
-                <input type="submit" value="出勤">
+                <% if (!locals.isLoggedIn) { %>
+                    <input type="submit" value="出勤" onclick="alert('ログインしてください。'); return false;">
+                <% } else if (locals.currentState === "出勤前") { %>
+                    <input type="submit" value="出勤" onclick="return confirm('出勤しますか？')">
+                <% } else { %>
+                    <input type="submit" value="出勤" onclick="alert('すでに出勤しています。'); return false;">
+                <% } %>
+                
             </form>
 
             <!--退勤-->
             <form action="/finish_work" method="post" style="display: inline">
-                <input type="submit" value="退勤">
+                <% if (!locals.isLoggedIn) { %>
+                    <input type="submit" value="退勤" onclick="alert('ログインしてください。'); return false;">
+                <% } else if (locals.currentState === "出勤前") { %>
+                    <input type="submit" value="出勤" onclick="alert('まだ出勤していません'); return false;">
+                <% }　else if (locals.currentState === "勤務中") { %>
+                    <input type="submit" value="出勤" onclick="return confirm('退勤しますか？')">
+                <% } else { %>
+                    <input type="submit" value="退勤" onclick="alert('すでに退勤しています。'); return false;">
+                <% } %>
             </form>
         </div>
 
         <!--過去の勤務状況-->
-        <div class="table-wrapper">
-            <h2 class="table-label">過去の勤務状況</h2>
+        <div class="history-wrapper">
+            <h2 class="history-label">過去の勤務状況</h2>
 
             <% if (locals.isLoggedIn) { %>
 
@@ -80,6 +95,7 @@
                         勤務時間
                     </span>
                 </div>
+
                 <ul class="table-body">
                     <% work_data.forEach((datum) => { 
                         function twoDigit(num) {
@@ -104,14 +120,14 @@
                                     <%= datum.working_hours %>
                                 </span>
                                 <form action="/delete/<%= datum.id %>" method="post" style="display: inline">
-                                    <input type="submit" value="削除">
+                                    <input type="submit" value="削除" onclick="return confirm('選択したデータを削除します。よろしいですか？')">
                                 </form>
                             </li>
                         <% }
                     }); %>
                 </ul>
 
-                <canvas id="working-hours"></canvas>
+                <canvas id="working-hours-graph"></canvas>
                 <%
                     dates = [];
                     workingHours = [];
@@ -134,7 +150,7 @@
                     dates = [<%= dates %>];
                     workingHours = [<%= workingHours %>];
                     (function(){
-                        var ctx = document.getElementById("working-hours");
+                        var ctx = document.getElementById("working-hours-graph");
                         
                         var data = {
                             labels: dates,
@@ -165,6 +181,7 @@
                                 }]
                             }
                         };
+
                         var ex_chart = new Chart(ctx, {
                             type: 'line', //折れ線グラフ
                             data: data, //上記設定のデータ
