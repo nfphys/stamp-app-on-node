@@ -18,7 +18,7 @@ app.use(
     })
 )
 
-const bcrypt = require('bcrypt');
+//const bcrypt = require('bcrypt');
 
 app.use(express.static('public'));
 app.use(express.urlencoded({extended: false})); // これがないと req.body が undefined になる
