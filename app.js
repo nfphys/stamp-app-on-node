@@ -189,12 +189,24 @@ app.post('/signup', (req, res) => {
 
 // 記録ページ
 app.get('/record', (req, res) => {
-    connection.query(
-        'SELECT * FROM work_data ORDER BY id DESC', 
-        (error, results) => {
-            res.render('record.ejs', {work_data: results});
-        }
-    )
+    today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth() + 1;
+    const year_month = year + "-" + twoDigit(month);
+    //console.log(YM_today);
+
+    if (res.locals.isLoggedIn) {
+        const username = res.locals.username;
+        connection.query(
+            'SELECT * FROM work_data WHERE username=? && date>=? && date<=? ORDER BY id DESC', 
+            [username, year_month + "-01", year_month + "-31"],
+            (error, results) => {
+                res.render('record.ejs', {work_data: results, year_month: year_month});
+            }
+        )
+    } else {
+        res.render('record.ejs');
+    }
 });
 
 // 出勤
@@ -204,7 +216,9 @@ app.post('/start_work', (req, res) => {
     } else if (req.session.startWorkTime === undefined) {
         let date = new Date();
         req.session.startWorkTime = date.toLocaleString("ja");
-    }
+    } else {
+        console.log("本日は出勤済です");
+    } 
     res.redirect('/record');
 });
 
@@ -235,7 +249,7 @@ app.post('/finish_work', (req, res) => {
         temp = Math.floor(temp / 60); 
         let hour = twoDigit(temp);
         let workingHours = hour + ":" + min + ":" + sec;
-        console.log(workingHours);
+        // console.log(workingHours);
 
         connection.query(
             'INSERT INTO work_data(date, working_hours, username) VALUES(?, ?, ?)', 
@@ -259,6 +273,25 @@ app.post('/delete/:id', (req, res) => {
         }
     );
 });
+
+
+// 過去の勤務状況を取得
+app.post('/history', (req, res) => {
+    console.log(req.body.year_month)
+    const year_month = req.body.year_month;
+    if (res.locals.isLoggedIn) {
+        const username = res.locals.username;
+        connection.query(
+            'SELECT * FROM work_data WHERE username=? && date>=? && date<=? ORDER BY id DESC', 
+            [username, year_month + "-01", year_month + "-31"],
+            (error, results) => {
+                res.render('record.ejs', {work_data: results, year_month: year_month});
+            }
+        )
+    } else {
+        res.render('record.ejs');
+    }
+})
 
 
 

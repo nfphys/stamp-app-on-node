@@ -65,6 +65,12 @@
             <h2 class="table-label">過去の勤務状況</h2>
 
             <% if (locals.isLoggedIn) { %>
+
+                <!--過去の勤務状況を検索-->
+                <form action="/history" method="post">
+                    <input type="month" value="<%= year_month %>" name="year_month">
+                    <input type="submit" value="検索">
+                </form>
                 
                 <div class="table-head">
                     <span class="day-column">
@@ -105,21 +111,60 @@
                     }); %>
                 </ul>
 
-                <canvas id="sample1"></canvas>
+                <canvas id="working-hours"></canvas>
+                <%
+                    dates = [];
+                    workingHours = [];
+                    for (i = 0; i < 31; i++) {
+                        dates.push(i+1);
+                        workingHours.push(0);
+                    }
+
+                    function timeToFloat(time) {
+                        let temp = time.split(":");
+                        return +temp[0] + temp[1]/60 + temp[2]/3600;
+                    }
+
+                    work_data.reverse();
+                    work_data.forEach((datum) => {
+                        workingHours[datum.date.getDate()-1] = timeToFloat(datum.working_hours);
+                    })
+                %>
                 <script>
+                    dates = [<%= dates %>];
+                    workingHours = [<%= workingHours %>];
                     (function(){
-                        var ctx = document.getElementById("sample1");
+                        var ctx = document.getElementById("working-hours");
                         
                         var data = {
-                            labels: ["4月", "5月", "6月", "7月", "8月"],
+                            labels: dates,
                             datasets: [{
-                                label: '任天堂',
-                                data: [11433, 23510, 15943, 34212, 19841], //配列でデータをセット
+                                label: '勤務時間',
+                                data: workingHours, //配列でデータをセット
                                 borderColor: 'rgba(255, 0, 0, 1)', //ボーダーの色
+                                lineTension: 0,
                             }]
                         };
                         
-                        var options = {};
+                        var options = {
+                            scales: {
+                                xAxes: [{
+                                    scaleLabel: {
+                                        display: true,
+                                        labelString: '日'
+                                    }
+                                }],
+                                yAxes: [{
+                                    ticks: {
+                                        beginAtZero:true
+                                    }, 
+                                    scaleLabel: {
+                                        display: true, 
+                                        labelString: '勤務時間[h]'
+                                    }
+                                }]
+                            }
+                        };
                         var ex_chart = new Chart(ctx, {
                             type: 'line', //折れ線グラフ
                             data: data, //上記設定のデータ
