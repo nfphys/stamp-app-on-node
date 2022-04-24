@@ -6,6 +6,7 @@
     <title>STAMP APP</title>
     <script src="/send_url.js"></script>
     <script src="./script.js"></script>
+    <link rel="stylesheet" href="/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
 </head>
 
@@ -46,48 +47,116 @@
         -->
 
         <!--打刻-->
-        <div class="btn-wrapper"> 
+        <div id="stamp-wrapper"> 
             <h2>打刻</h2>
 
             <!--出勤-->
             <form action="/start_work" method="post" style="display: inline">
                 <% if (!locals.isLoggedIn) { %>
-                    <input type="submit" value="出勤" onclick="alert('ログインしてください。'); return false;">
+                    <input type="submit" value="出勤" id="start-work" onclick="alert('ログインしてください。'); return false;">
                 <% } else if (locals.currentState === "出勤前") { %>
-                    <input type="submit" value="出勤" onclick="return confirm('出勤しますか？')">
+                    <input type="submit" value="出勤" id="start-work" onclick="return confirm('出勤しますか？')">
                 <% } else { %>
-                    <input type="submit" value="出勤" onclick="alert('すでに出勤しています。'); return false;">
+                    <input type="submit" value="出勤" id="start-work" onclick="alert('すでに出勤しています。'); return false;">
                 <% } %>
                 
             </form>
 
             <!--退勤-->
-            <form action="/finish_work" method="post" style="display: inline">
+            <form action="/finish_work" method="post" style="display: inline" >
                 <% if (!locals.isLoggedIn) { %>
-                    <input type="submit" value="退勤" onclick="alert('ログインしてください。'); return false;">
+                    <input type="submit" value="退勤" id="finish-work" onclick="alert('ログインしてください。'); return false;">
                 <% } else if (locals.currentState === "出勤前") { %>
-                    <input type="submit" value="出勤" onclick="alert('まだ出勤していません'); return false;">
+                    <input type="submit" value="退勤" id="finish-work" onclick="alert('まだ出勤していません'); return false;">
                 <% }　else if (locals.currentState === "勤務中") { %>
-                    <input type="submit" value="出勤" onclick="return confirm('退勤しますか？')">
+                    <input type="submit" value="退勤" id="finish-work" onclick="return confirm('退勤しますか？')">
                 <% } else { %>
-                    <input type="submit" value="退勤" onclick="alert('すでに退勤しています。'); return false;">
+                    <input type="submit" value="退勤" id="finish-work" onclick="alert('すでに退勤しています。'); return false;">
                 <% } %>
             </form>
         </div>
 
         <!--過去の勤務状況-->
-        <div class="history-wrapper">
+        <div id="history-wrapper">
             <h2 class="history-label">過去の勤務状況</h2>
 
             <% if (locals.isLoggedIn) { %>
 
                 <!--過去の勤務状況を検索-->
-                <form action="/history" method="post">
+                <form action="/history" method="post" id="search-history">
                     <input type="month" value="<%= year_month %>" name="year_month">
                     <input type="submit" value="検索">
                 </form>
+
+                <!--グラフ-->
+                <canvas id="working-hours-graph"></canvas>
+                <%
+                    dates = [];
+                    workingHours = [];
+                    for (i = 0; i < 31; i++) {
+                        dates.push(i+1);
+                        workingHours.push(0);
+                    }
+
+                    function timeToFloat(time) {
+                        let temp = time.split(":");
+                        return +temp[0] + temp[1]/60 + temp[2]/3600;
+                    }
+
+                    work_data.reverse();
+                    work_data.forEach((datum) => {
+                        workingHours[datum.date.getDate()-1] = timeToFloat(datum.working_hours);
+                    })
+                    work_data.reverse();
+                %>
+                <script>
+                    dates = [<%= dates %>];
+                    workingHours = [<%= workingHours %>];
+                    (function(){
+                        var ctx = document.getElementById("working-hours-graph");
+                        
+                        var data = {
+                            labels: dates,
+                            datasets: [{
+                                label: '勤務時間',
+                                data: workingHours, //配列でデータをセット
+                                borderColor: '#80bcff', //ボーダーの色
+                                lineTension: 0,
+                            }]
+                        };
+                        
+                        var options = {
+                            scales: {
+                                xAxes: [{
+                                    scaleLabel: {
+                                        display: true,
+                                        labelString: '日'
+                                    }
+                                }],
+                                yAxes: [{
+                                    ticks: {
+                                        beginAtZero:true
+                                    }, 
+                                    scaleLabel: {
+                                        display: true, 
+                                        labelString: '勤務時間[h]'
+                                    }
+                                }],
+                                legend: {
+                                    display: false
+                                }
+                            }
+                        };
+
+                        var ex_chart = new Chart(ctx, {
+                            type: 'line', //折れ線グラフ
+                            data: data, //上記設定のデータ
+                            options: options
+                        });
+                    }());
+                </script>
                 
-                <div class="table-head">
+                <div id="table-head">
                     <span class="day-column">
                         日付
                     </span>
@@ -96,7 +165,7 @@
                     </span>
                 </div>
 
-                <ul class="table-body">
+                <ul id="table-body">
                     <% work_data.forEach((datum) => { 
                         function twoDigit(num) {
                             let ret;
@@ -119,7 +188,7 @@
                                 <span class="working-hours-column">
                                     <%= datum.working_hours %>
                                 </span>
-                                <form action="/delete/<%= datum.id %>" method="post" style="display: inline">
+                                <form action="/delete/<%= datum.id %>" method="post" style="display: inline" id="delete-work-data">
                                     <input type="submit" value="削除" onclick="return confirm('選択したデータを削除します。よろしいですか？')">
                                 </form>
                             </li>
@@ -127,68 +196,6 @@
                     }); %>
                 </ul>
 
-                <canvas id="working-hours-graph"></canvas>
-                <%
-                    dates = [];
-                    workingHours = [];
-                    for (i = 0; i < 31; i++) {
-                        dates.push(i+1);
-                        workingHours.push(0);
-                    }
-
-                    function timeToFloat(time) {
-                        let temp = time.split(":");
-                        return +temp[0] + temp[1]/60 + temp[2]/3600;
-                    }
-
-                    work_data.reverse();
-                    work_data.forEach((datum) => {
-                        workingHours[datum.date.getDate()-1] = timeToFloat(datum.working_hours);
-                    })
-                %>
-                <script>
-                    dates = [<%= dates %>];
-                    workingHours = [<%= workingHours %>];
-                    (function(){
-                        var ctx = document.getElementById("working-hours-graph");
-                        
-                        var data = {
-                            labels: dates,
-                            datasets: [{
-                                label: '勤務時間',
-                                data: workingHours, //配列でデータをセット
-                                borderColor: 'rgba(255, 0, 0, 1)', //ボーダーの色
-                                lineTension: 0,
-                            }]
-                        };
-                        
-                        var options = {
-                            scales: {
-                                xAxes: [{
-                                    scaleLabel: {
-                                        display: true,
-                                        labelString: '日'
-                                    }
-                                }],
-                                yAxes: [{
-                                    ticks: {
-                                        beginAtZero:true
-                                    }, 
-                                    scaleLabel: {
-                                        display: true, 
-                                        labelString: '勤務時間[h]'
-                                    }
-                                }]
-                            }
-                        };
-
-                        var ex_chart = new Chart(ctx, {
-                            type: 'line', //折れ線グラフ
-                            data: data, //上記設定のデータ
-                            options: options
-                        });
-                    }());
-                </script>
 
             <% } else { %>
                 <p>ログインしてください</p>
