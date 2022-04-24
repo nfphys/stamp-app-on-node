@@ -49,17 +49,14 @@ input {
   
 /* top ================================ */
 .top-wrapper {
-    max-width: 1200px;
-    min-width: 920px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    max-width: 1000px;
+    min-width: 1000px;
     margin: 0 auto;
     padding: 60px;
 }
   
 .top-detail {
-    width: 36%;
+    width: 40%;
     min-width: 320px;
     margin-top: -40px;
 }
@@ -139,7 +136,8 @@ header {
     float: left;
 }
 
-.header-list {
+
+.header-login, .header-logout, .header-signup {
     margin-left: 56px;
     font-weight: 300;
     font-size: 20px;
@@ -149,17 +147,7 @@ header {
     float: left;
 }
 
-.header-login, .header-logout {
-    margin-left: 56px;
-    font-weight: 300;
-    font-size: 20px;
-    line-height: 56px;
-    color: #6c7686;
-    display: inline;
-    float: left;
-}
-
-.header-login:hover, .header-logout:hover {
+.header-login:hover, .header-logout:hover, .header-signup:hover {
     color: #58d2b2;
 }
 
@@ -168,7 +156,7 @@ header {
 
 .main {
     border-top: 20px solid #88E7CE;
-    max-width: 900px;
+    max-width: 1000px;
     min-width: 1000px;
     justify-content: center;
     align-items: center;
@@ -176,34 +164,7 @@ header {
     padding: 60px;
 }
 
-#current-time-wrapper {
-    margin: 10px;
-    width: 400px;
-    height: 80px;
-    float: left;
-    text-align: center;
-    border-bottom: 2px solid;
-}
-
-#current-state-wrapper {
-    margin: 10px;
-    width: 400px;
-    height: 80px;
-    float: left;
-    text-align: center;
-    border-bottom: 2px solid;
-}
-
-#start-time-wrapper {
-    margin: 10px;
-    width: 400px;
-    height: 80px;
-    float: left;
-    text-align: center;
-    border-bottom: 2px solid;
-}
-
-#finish-time-wrapper {
+#current-time-wrapper, #current-state-wrapper, #start-time-wrapper, #finish-time-wrapper {
     margin: 10px;
     width: 400px;
     height: 80px;
@@ -391,13 +352,7 @@ header {
     box-shadow: 0 0 0px 1000px #fff inset;
 }
 
-.sign input[name="email"] {
-    font-size: 12px;
-    margin-bottom: 30px;
-    width: 100%;
-}
-
-.sign input[name="password"] {
+.sign input[name="username"], .sign input[name="email"], .sign input[name="password"] {
     font-size: 12px;
     margin-bottom: 30px;
     width: 100%;

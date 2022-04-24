@@ -2,7 +2,7 @@
     <a class="header-logo" href="/" >STAMP APP</a>
     <p class="header-greeting">ようこそ、<%= locals.username %>さん</p>
     <ul class="header-list">
-        <!--<a href="/signup">新規登録</a>-->
+        <li><a href="/signup" class="header-signup">新規登録</a></li>
         <% if (locals.isLoggedIn) { %>
             <li><a href="/logout" class="header-logout">ログアウト</a></li>
         <% } else { %>
