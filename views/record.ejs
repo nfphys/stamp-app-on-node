@@ -46,6 +46,20 @@
             <p id="finish-time"><%= locals.finishWorkTime %></p>
         </div>
 
+        <!--休憩開始時刻
+        <div id="start-break-time-wrapper">
+            <h2>休憩開始時刻</h2>
+            <p id="start-break-time"><%= locals.startBreakTime %></p>
+        </div>
+        -->
+
+        <!--休憩終了時刻
+        <div id="finish-break-time-wrapper">
+            <h2>休憩終了時刻</h2>
+            <p id="finish-break-time"><%= locals.finishBreakTime %></p>
+        </div>
+        -->
+
         <!--本日の勤務時間-->
         <div id="working-hours-wrapper">
             <h2>本日の勤務時間</h2>
@@ -54,10 +68,28 @@
         <script>
             function showWorkingHours() {
                 currentState = document.getElementById("current-state").textContent;
-                if (currentState === "勤務中") {
-                    now = new Date();
+                if (currentState === "勤務中" || currentState === "休憩中") {
                     start = document.getElementById("start-time").textContent;
+                    now = new Date();
                     workingHours = Math.floor((now.getTime() - Date.parse(start))/1000);
+
+                    let temp = workingHours;
+
+                    let sec  = twoDigit(temp % 60);
+                    temp = Math.floor(temp / 60); 
+
+                    let min  = twoDigit(temp % 60);
+                    temp = Math.floor(temp / 60); 
+
+                    let hour = twoDigit(temp);
+
+                    let msg = hour + ":" + min + ":" + sec;
+                    document.getElementById("working-hours").innerHTML = msg;
+                } 
+                if (currentState === "退勤済") {
+                    start = document.getElementById("start-time").textContent;
+                    finish = document.getElementById("finish-time").textContent;
+                    workingHours = Math.floor((Date.parse(finish) - Date.parse(start))/1000);
 
                     let temp = workingHours;
 
@@ -83,6 +115,49 @@
             <h2>本日の休憩時間</h2>
             <p id="breaking-hours">00:00:00</p>
         </div>
+        <script>
+            function showBreakingHours() {
+                currentState = document.getElementById("current-state").textContent;
+                if (currentState === "休憩中") {
+                    start = document.getElementById("start-break-time").textContent;
+                    now = new Date();
+                    workingHours = Math.floor((now.getTime() - Date.parse(start))/1000);
+
+                    let temp = workingHours;
+
+                    let sec  = twoDigit(temp % 60);
+                    temp = Math.floor(temp / 60); 
+
+                    let min  = twoDigit(temp % 60);
+                    temp = Math.floor(temp / 60); 
+
+                    let hour = twoDigit(temp);
+
+                    let msg = hour + ":" + min + ":" + sec;
+                    document.getElementById("breaking-hours").innerHTML = msg;
+                } 
+                if (document.getElementById("finish-break-time").textContent !== "") {
+                    start = document.getElementById("start-break-time").textContent;
+                    finish = document.getElementById("finish-break-time").textContent;
+                    workingHours = Math.floor((Date.parse(finish) - Date.parse(start))/1000);
+
+                    let temp = workingHours;
+
+                    let sec  = twoDigit(temp % 60);
+                    temp = Math.floor(temp / 60); 
+
+                    let min  = twoDigit(temp % 60);
+                    temp = Math.floor(temp / 60); 
+
+                    let hour = twoDigit(temp);
+
+                    let msg = hour + ":" + min + ":" + sec;
+                    document.getElementById("breaking-hours").innerHTML = msg;
+                }
+            };
+
+            setInterval("showBreakingHours()", 10);
+        </script>
         -->
 
         <!--打刻-->

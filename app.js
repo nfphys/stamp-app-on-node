@@ -74,6 +74,14 @@ app.use((req, res, next) => {
     if (res.locals.onBreak) {
         res.locals.currentState = "休憩中";
     }
+
+    if (req.session.startBreakTime !== undefined) {
+        res.locals.startBreakTime = req.session.startBreakTime;
+        console.log(req.session.startBreakTime);
+    }
+    if (req.session.finishBreakTime !== undefined) {
+        res.locals.finishBreakTime = req.session.finishBreakTime;
+    }
     
     /*
     if (req.session.workingHours === undefined) {
@@ -305,6 +313,9 @@ app.post('/start_break', (req, res) => {
         } else {
             console.log("休憩を開始しました");
             req.session.onBreak = true;
+
+            let date = new Date();
+            req.session.startBreakTime = date.toLocaleString("ja");
         }
     }
     res.redirect('/record');
@@ -320,6 +331,9 @@ app.post('/finish_break', (req, res) => {
         if (res.locals.onBreak) {
             console.log("休憩を終了しました");
             req.session.onBreak = false;
+
+            let date = new Date();
+            req.session.finishBreakTime = date.toLocaleString("ja");
         } else {
             console.log("まだ休憩を開始していません");
         }

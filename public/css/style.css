@@ -173,7 +173,9 @@ header {
 #start-time-wrapper, 
 #finish-time-wrapper,
 #working-hours-wrapper, 
-#breaking-hours-wrapper {
+#breaking-hours-wrapper, 
+#start-break-time-wrapper, 
+#finish-break-time-wrapper {
     margin: 10px;
     width: 400px;
     height: 80px;
