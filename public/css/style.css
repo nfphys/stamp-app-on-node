@@ -137,7 +137,9 @@ header {
 }
 
 
-.header-login, .header-logout, .header-signup {
+.header-login, 
+.header-logout, 
+.header-signup {
     margin-left: 56px;
     font-weight: 300;
     font-size: 20px;
@@ -147,7 +149,9 @@ header {
     float: left;
 }
 
-.header-login:hover, .header-logout:hover, .header-signup:hover {
+.header-login:hover, 
+.header-logout:hover, 
+.header-signup:hover {
     color: #58d2b2;
 }
 
@@ -155,7 +159,7 @@ header {
 /* main ================================ */
 
 .main {
-    border-top: 20px solid #88E7CE;
+    /* border-top: 20px solid #88E7CE; */
     max-width: 1000px;
     min-width: 1000px;
     justify-content: center;
@@ -164,7 +168,12 @@ header {
     padding: 60px;
 }
 
-#current-time-wrapper, #current-state-wrapper, #start-time-wrapper, #finish-time-wrapper {
+#current-time-wrapper, 
+#current-state-wrapper, 
+#start-time-wrapper, 
+#finish-time-wrapper,
+#working-hours-wrapper, 
+#breaking-hours-wrapper {
     margin: 10px;
     width: 400px;
     height: 80px;
@@ -185,7 +194,10 @@ header {
     border-bottom: 2px solid;
 }
 
-#start-work, #finish-work {
+#start-work, 
+#finish-work, 
+#start_break, 
+#finish_break {
     width: 120px;
     height: 45px;
     margin-top: 24px;
@@ -199,7 +211,10 @@ header {
     border: 2px solid #80bcff;
 }
 
-#start-work:hover, #finish-work:hover {
+#start-work:hover, 
+#finish-work:hover, 
+#start_break:hover, 
+#finish_break:hover {
     background-color: #ffffff;
     color: #80bcff;
     transition: all 0.3s ease;
@@ -310,7 +325,7 @@ header {
 /* login ======================== */
 
 .sign {
-    border-top: 20px solid #88E7CE;
+    /* border-top: 20px solid #88E7CE; */
     display: flex;
     align-items: center;
     justify-content: center;

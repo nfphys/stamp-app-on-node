@@ -20,6 +20,13 @@
             <h2>現在時刻</h2>
             <p id="current-time"></p>
         </div>
+        <script>
+            function showCurrentTime() {
+                let date = new Date();
+                document.getElementById("current-time").innerHTML = date.toLocaleString("ja");
+            }
+            setInterval('showCurrentTime()', 10);
+        </script>
 
         <!--勤務状況(勤務外、勤務中、休憩中のいずれか)-->
         <div id="current-state-wrapper">
@@ -39,10 +46,42 @@
             <p id="finish-time"><%= locals.finishWorkTime %></p>
         </div>
 
-        <!--本日の勤務時間
+        <!--本日の勤務時間-->
         <div id="working-hours-wrapper">
             <h2>本日の勤務時間</h2>
             <p id="working-hours">00:00:00</p>
+        </div>
+        <script>
+            function showWorkingHours() {
+                currentState = document.getElementById("current-state").textContent;
+                if (currentState === "勤務中") {
+                    now = new Date();
+                    start = document.getElementById("start-time").textContent;
+                    workingHours = Math.floor((now.getTime() - Date.parse(start))/1000);
+
+                    let temp = workingHours;
+
+                    let sec  = twoDigit(temp % 60);
+                    temp = Math.floor(temp / 60); 
+
+                    let min  = twoDigit(temp % 60);
+                    temp = Math.floor(temp / 60); 
+
+                    let hour = twoDigit(temp);
+
+                    let msg = hour + ":" + min + ":" + sec;
+                    document.getElementById("working-hours").innerHTML = msg;
+                }
+                    
+            };
+
+            setInterval("showWorkingHours()", 10);
+        </script>
+
+        <!--本日の休憩時間
+        <div id="breaking-hours-wrapper">
+            <h2>本日の休憩時間</h2>
+            <p id="breaking-hours">00:00:00</p>
         </div>
         -->
 
@@ -67,13 +106,45 @@
                 <% if (!locals.isLoggedIn) { %>
                     <input type="submit" value="退勤" id="finish-work" onclick="alert('ログインしてください。'); return false;">
                 <% } else if (locals.currentState === "出勤前") { %>
-                    <input type="submit" value="退勤" id="finish-work" onclick="alert('まだ出勤していません'); return false;">
+                    <input type="submit" value="退勤" id="finish-work" onclick="alert('まだ出勤していません。'); return false;">
                 <% }　else if (locals.currentState === "勤務中") { %>
                     <input type="submit" value="退勤" id="finish-work" onclick="return confirm('退勤しますか？')">
                 <% } else { %>
                     <input type="submit" value="退勤" id="finish-work" onclick="alert('すでに退勤しています。'); return false;">
                 <% } %>
             </form>
+
+            <!--休憩
+            <form action="/start_break" method="post" style="display: inline" >
+                <% if (!locals.isLoggedIn) { %>
+                    <input type="submit" value="休憩" id="start_break" onclick="alert('ログインしてください。'); return false;">
+                <% } else if (locals.currentState === "出勤前") { %>
+                    <input type="submit" value="休憩" id="start_break" onclick="alert('まだ出勤していません。'); return false;">
+                <% }　else if (locals.currentState === "勤務中") { %>
+                    <input type="submit" value="休憩" id="start_break" onclick="return confirm('休憩しますか？')">
+                <% }else if (locals.currentState === "休憩中") { %>
+                    <input type="submit" value="休憩" id="start_break" onclick="return confirm('休憩中です。')">
+                <% } else { %>
+                    <input type="submit" value="休憩" id="start_break" onclick="alert('すでに退勤しています。'); return false;">
+                <% } %>
+            </form>
+            -->
+
+            <!--戻り
+            <form action="/finish_break" method="post" style="display: inline" >
+                <% if (!locals.isLoggedIn) { %>
+                    <input type="submit" value="戻り" id="finish_break" onclick="alert('ログインしてください。'); return false;">
+                <% } else if (locals.currentState === "出勤前") { %>
+                    <input type="submit" value="戻り" id="finish_break" onclick="alert('まだ出勤していません。'); return false;">
+                <% }　else if (locals.currentState === "勤務中") { %>
+                    <input type="submit" value="戻り" id="finish_break" onclick="return confirm('まだ休憩していません。')">
+                <% }else if (locals.currentState === "休憩中") { %>
+                    <input type="submit" value="戻り" id="finish_break" onclick="return confirm('勤務を再開しますか？')">
+                <% } else { %>
+                    <input type="submit" value="戻り" id="finish_break" onclick="alert('すでに退勤しています。'); return false;">
+                <% } %>
+            </form>
+            -->
         </div>
 
         <!--過去の勤務状況-->
