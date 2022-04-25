@@ -224,19 +224,28 @@
 
         <!--過去の勤務状況-->
         <div id="history-wrapper">
-            <h2 class="history-label">過去の勤務状況</h2>
+            <h2 id="history-label">過去の勤務状況</h2>
 
             <% if (locals.isLoggedIn) { %>
 
                 <!--過去の勤務状況を検索-->
+                <%
+                    let temp = year_month_history.split("-");
+                    let year_history = temp[0];
+
+                    let month_history = +temp[1];
+                %>
                 <form action="/history" method="post" id="search-history">
-                    <input type="month" value="<%= year_month %>" name="year_month">
+                    <input type="month" value="<%= year_month_history %>" name="year_month_history">
                     <input type="submit" value="検索">
                 </form>
 
-                <!--グラフ-->
-                <canvas id="working-hours-graph"></canvas>
                 <%
+                    function timeToFloat(time) {
+                        let temp = time.split(":");
+                        return +temp[0] + temp[1]/60 + temp[2]/3600;
+                    }
+
                     dates = [];
                     workingHours = [];
                     for (i = 0; i < 31; i++) {
@@ -244,17 +253,35 @@
                         workingHours.push(0);
                     }
 
-                    function timeToFloat(time) {
-                        let temp = time.split(":");
-                        return +temp[0] + temp[1]/60 + temp[2]/3600;
-                    }
+                    totalWorkingHours = 0;
 
                     work_data.reverse();
                     work_data.forEach((datum) => {
                         workingHours[datum.date.getDate()-1] = timeToFloat(datum.working_hours);
+                        totalWorkingHours += timeToFloat(datum.working_hours);
                     })
                     work_data.reverse();
+
+                    averageWorkingHours = 0;
+                    if (work_data.length > 0) {
+                        averageWorkingHours = totalWorkingHours/work_data.length;
+                    }
                 %>
+
+                <!--総勤務時間-->
+                <div id="total-working-hours-wrapper">
+                    <h2><%= month_history %>月の総勤務時間</h2>
+                    <p id="total-working-hours"><%= Math.floor(totalWorkingHours) %>時間</p>
+                </div>
+
+                <!--平均勤務時間-->
+                <div id="average-working-hours-wrapper">
+                    <h2><%= month_history %>月の平均勤務時間</h2>
+                    <p id="average-working-hours"><%= Math.floor(averageWorkingHours) %>時間</p>
+                </div>
+
+                <!--グラフ-->
+                <canvas id="working-hours-graph"></canvas>
                 <script>
                     dates = [<%= dates %>];
                     workingHours = [<%= workingHours %>];
@@ -301,7 +328,9 @@
                         });
                     }());
                 </script>
+                <!--グラフ ここまで-->
                 
+                <!--表-->
                 <div id="table-head">
                     <span class="day-column">
                         日付
@@ -341,6 +370,7 @@
                         <% }
                     }); %>
                 </ul>
+                <!--表 ここまで-->
 
 
             <% } else { %>

@@ -1,3 +1,4 @@
+
 const express = require('express');
 const app = express();
 
@@ -34,31 +35,26 @@ function twoDigit(num) {
 
 app.use((req, res, next) => {
     if (req.session.userId === undefined) {
-        //console.log("ログインしていません");
         res.locals.username = 'ゲスト';
         res.locals.isLoggedIn = false;
     } else {
-        //console.log("ログインしています");
         res.locals.username = req.session.username;
         res.locals.isLoggedIn = true;
     }
 
     // 勤務中かどうか
     if (req.session.startWorkTime === undefined) {
-        //console.log("出勤していません");
         res.locals.startedWork = false;
         res.locals.finishedWork = false;
         res.locals.currentState = "出勤前";
     } else {
-        //console.log("出勤しました");
         res.locals.startedWork = true;
         res.locals.startWorkTime = req.session.startWorkTime;
-        res.locals.currentState = "勤務中";
 
         if (req.session.finishWorkTime === undefined) {
-            //console.log("退勤していません");
+            res.locals.finishedWork = false;
+            res.locals.currentState = "勤務中";
         } else {
-            //console.log("退勤しました");
             res.locals.finishedWork = true;
             res.locals.finishWorkTime = req.session.finishWorkTime;
             res.locals.currentState = "退勤済";
@@ -66,6 +62,7 @@ app.use((req, res, next) => {
     }
 
     // 休憩中かどうか
+    /*
     if (req.session.onBreak === undefined) {
         res.locals.onBreak = false;
     } else {
@@ -82,8 +79,6 @@ app.use((req, res, next) => {
     if (req.session.finishBreakTime !== undefined) {
         res.locals.finishBreakTime = req.session.finishBreakTime;
     }
-    
-    /*
     if (req.session.workingHours === undefined) {
         req.session.workingHours = [0];
     } else {
@@ -140,7 +135,6 @@ app.get('/logout', (req, res) => {
     });
 });
 
-
 // 新規登録
 app.get('/signup', (req, res) => {
     res.render('signup.ejs', { errors: []});
@@ -180,7 +174,7 @@ app.post('/signup',
             [email],
             (error, results) => {
                 if (results.length > 0) {
-                    errors.push("ユーザー登録に失敗しました");
+                    errors.push("このメールアドレスはすでに登録されています。");
                     res.render("signup.ejs", {errors: errors})
                 } else {
                     next();
@@ -224,23 +218,24 @@ app.post('/signup', (req, res) => {
 
 // 記録ページ
 app.get('/record', (req, res) => {
-    let year_month = "";
-    if (req.session.year_month === undefined) {
+    let year_month_history = "";
+    if (req.session.year_month_history === undefined) {
         today = new Date();
         const year = today.getFullYear();
         const month = today.getMonth() + 1;
-        year_month = year + "-" + twoDigit(month);
+        year_month_history = year + "-" + twoDigit(month);
     } else {
-        year_month = req.session.year_month
+        year_month_history = req.session.year_month_history
     }
 
+    // year_month_historyで指定した年月の勤務状況を表示する
     if (res.locals.isLoggedIn) {
         const username = res.locals.username;
         connection.query(
-            'SELECT * FROM work_data WHERE username=? && date>=? && date<=? ORDER BY id DESC', 
-            [username, year_month + "-01", year_month + "-31"],
+            'SELECT * FROM work_data WHERE username=? && date>=? && date<=? ORDER BY date DESC', 
+            [username, year_month_history + "-01", year_month_history + "-31"],
             (error, results) => {
-                res.render('record.ejs', {work_data: results, year_month: year_month});
+                res.render('record.ejs', {work_data: results, year_month_history: year_month_history});
             }
         )
     } else {
@@ -358,7 +353,7 @@ app.post('/delete/:id', (req, res) => {
 
 // 過去の勤務状況を取得
 app.post('/history', (req, res) => {
-    req.session.year_month = req.body.year_month;
+    req.session.year_month_history = req.body.year_month_history;
     res.redirect('/record');
 })
 

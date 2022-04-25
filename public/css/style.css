@@ -160,8 +160,7 @@ header {
 
 .main {
     /* border-top: 20px solid #88E7CE; */
-    max-width: 1000px;
-    min-width: 1000px;
+    width: 1000px;
     justify-content: center;
     align-items: center;
     margin: 0 auto;
@@ -175,7 +174,7 @@ header {
 #working-hours-wrapper, 
 #breaking-hours-wrapper, 
 #start-break-time-wrapper, 
-#finish-break-time-wrapper {
+#finish-break-time-wrapper{
     margin: 10px;
     width: 400px;
     height: 80px;
@@ -226,16 +225,20 @@ header {
 /* history ================================ */
 
 #history-wrapper {
-    margin: 20px;
-    width: 800px;
     float: left;
     text-align: center;
 }
 
+#history-label {
+    margin-left: auto; margin-right: auto;
+    margin: 20px;
+    width: 800px;
+
+}
 
 #search-history {
     margin: 20px;
-    text-align: center
+    width: 800px;
 }
 
 #search-history input[type="submit"] {
@@ -253,6 +256,16 @@ header {
     background-color: #ffffff;
     color: #80bcff;
     transition: all 0.3s ease;
+}
+
+#total-working-hours-wrapper, 
+#average-working-hours-wrapper {
+    margin: 10px;
+    width: 400px;
+    height: 80px;
+    float: left;
+    text-align: center;
+    border-bottom: 2px solid;
 }
 
 .day-column {

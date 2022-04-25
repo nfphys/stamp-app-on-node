@@ -4,7 +4,7 @@
     <ul class="header-list">
         <li><a href="/signup" class="header-signup">新規登録</a></li>
         <% if (locals.isLoggedIn) { %>
-            <li><a href="/logout" class="header-logout">ログアウト</a></li>
+            <li><a href="/logout" class="header-logout" onclick="return confirm('ログアウトします。よろしいですか？');">ログアウト</a></li>
         <% } else { %>
             <li><a href="/login" class="header-login">ログイン</a></li>
         <% } %>
