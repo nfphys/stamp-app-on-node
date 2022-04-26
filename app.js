@@ -199,6 +199,7 @@ app.post('/signup',
     }
 );
 
+/*
 app.post('/signup', (req, res) => {
     const username = req.body.username;
     const email    = req.body.email; 
@@ -214,6 +215,7 @@ app.post('/signup', (req, res) => {
         }
     )
 });
+*/
 
 
 // 記録ページ
@@ -245,7 +247,7 @@ app.get('/record', (req, res) => {
 
 // 出勤
 app.post('/start_work', (req, res) => {
-    if (res.locals.isLoggedIn === false) {
+    if (!res.locals.isLoggedIn) {
         console.log("まだログインしていません");
     } else if (!res.locals.startedWork) {
         let date = new Date();
@@ -258,7 +260,7 @@ app.post('/start_work', (req, res) => {
 
 // 退勤
 app.post('/finish_work', (req, res) => {
-    if (res.locals.isLoggedIn === false) {
+    if (!res.locals.isLoggedIn) {
         console.log("まだログインしていません");
     } else if (!res.locals.startedWork) {
         console.log("まだ出勤していません");
@@ -267,10 +269,8 @@ app.post('/finish_work', (req, res) => {
         req.session.finishWorkTime = date.toLocaleString("ja");
 
         // 日付
-        let year  =          date.getFullYear();
-        let month = twoDigit(date.getMonth() + 1);
-        let day   = twoDigit(date.getDate());
-        let date_string = year + "-" + month + "-" + day;
+        let temp = req.session.startWorkTime.split(" ")
+        let date_string = temp[0];
 
         // 勤務時間の計算
         start  = Date.parse(req.session.startWorkTime)/1000;
@@ -297,6 +297,7 @@ app.post('/finish_work', (req, res) => {
 });
 
 // 休憩
+/*
 app.post('/start_break', (req, res) => {
     if (res.locals.isLoggedIn === false) {
         console.log("まだログインしていません");
@@ -315,8 +316,10 @@ app.post('/start_break', (req, res) => {
     }
     res.redirect('/record');
 });
+*/
 
 // 戻り
+/*
 app.post('/finish_break', (req, res) => {
     if (res.locals.isLoggedIn === false) {
         console.log("まだログインしていません");
@@ -337,6 +340,7 @@ app.post('/finish_break', (req, res) => {
     }
     res.redirect('/record');
 });
+*/
 
 // 削除
 app.post('/delete/:id', (req, res) => {

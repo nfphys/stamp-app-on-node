@@ -66,44 +66,32 @@
             <p id="working-hours">00:00:00</p>
         </div>
         <script>
+            function intToTime(t) {
+                let sec  = twoDigit(t % 60);
+                t = Math.floor(t / 60); 
+
+                let min  = twoDigit(t% 60);
+                t = Math.floor(t / 60); 
+
+                let hour = twoDigit(t);
+
+                return hour + ":" + min + ":" + sec;
+            }
+            
             function showWorkingHours() {
+                workingHours = 0
                 currentState = document.getElementById("current-state").textContent;
                 if (currentState === "勤務中" || currentState === "休憩中") {
                     start = document.getElementById("start-time").textContent;
                     now = new Date();
                     workingHours = Math.floor((now.getTime() - Date.parse(start))/1000);
-
-                    let temp = workingHours;
-
-                    let sec  = twoDigit(temp % 60);
-                    temp = Math.floor(temp / 60); 
-
-                    let min  = twoDigit(temp % 60);
-                    temp = Math.floor(temp / 60); 
-
-                    let hour = twoDigit(temp);
-
-                    let msg = hour + ":" + min + ":" + sec;
-                    document.getElementById("working-hours").innerHTML = msg;
                 } 
                 if (currentState === "退勤済") {
                     start = document.getElementById("start-time").textContent;
                     finish = document.getElementById("finish-time").textContent;
                     workingHours = Math.floor((Date.parse(finish) - Date.parse(start))/1000);
-
-                    let temp = workingHours;
-
-                    let sec  = twoDigit(temp % 60);
-                    temp = Math.floor(temp / 60); 
-
-                    let min  = twoDigit(temp % 60);
-                    temp = Math.floor(temp / 60); 
-
-                    let hour = twoDigit(temp);
-
-                    let msg = hour + ":" + min + ":" + sec;
-                    document.getElementById("working-hours").innerHTML = msg;
                 }
+                document.getElementById("working-hours").innerHTML = intToTime(workingHours);
                     
             };
 
@@ -182,7 +170,7 @@
                     <input type="submit" value="退勤" id="finish-work" onclick="alert('ログインしてください。'); return false;">
                 <% } else if (locals.currentState === "出勤前") { %>
                     <input type="submit" value="退勤" id="finish-work" onclick="alert('まだ出勤していません。'); return false;">
-                <% }　else if (locals.currentState === "勤務中") { %>
+                <% } else if (locals.currentState === "勤務中") { %>
                     <input type="submit" value="退勤" id="finish-work" onclick="return confirm('退勤しますか？')">
                 <% } else { %>
                     <input type="submit" value="退勤" id="finish-work" onclick="alert('すでに退勤しています。'); return false;">
@@ -195,7 +183,7 @@
                     <input type="submit" value="休憩" id="start_break" onclick="alert('ログインしてください。'); return false;">
                 <% } else if (locals.currentState === "出勤前") { %>
                     <input type="submit" value="休憩" id="start_break" onclick="alert('まだ出勤していません。'); return false;">
-                <% }　else if (locals.currentState === "勤務中") { %>
+                <% } else if (locals.currentState === "勤務中") { %>
                     <input type="submit" value="休憩" id="start_break" onclick="return confirm('休憩しますか？')">
                 <% }else if (locals.currentState === "休憩中") { %>
                     <input type="submit" value="休憩" id="start_break" onclick="return confirm('休憩中です。')">
@@ -211,7 +199,7 @@
                     <input type="submit" value="戻り" id="finish_break" onclick="alert('ログインしてください。'); return false;">
                 <% } else if (locals.currentState === "出勤前") { %>
                     <input type="submit" value="戻り" id="finish_break" onclick="alert('まだ出勤していません。'); return false;">
-                <% }　else if (locals.currentState === "勤務中") { %>
+                <% } else if (locals.currentState === "勤務中") { %>
                     <input type="submit" value="戻り" id="finish_break" onclick="return confirm('まだ休憩していません。')">
                 <% }else if (locals.currentState === "休憩中") { %>
                     <input type="submit" value="戻り" id="finish_break" onclick="return confirm('勤務を再開しますか？')">
@@ -228,13 +216,14 @@
 
             <% if (locals.isLoggedIn) { %>
 
-                <!--過去の勤務状況を検索-->
                 <%
                     let temp = year_month_history.split("-");
                     let year_history = temp[0];
 
                     let month_history = +temp[1];
                 %>
+
+                <!--過去の勤務状況を検索-->
                 <form action="/history" method="post" id="search-history">
                     <input type="month" value="<%= year_month_history %>" name="year_month_history">
                     <input type="submit" value="検索">
@@ -255,12 +244,10 @@
 
                     totalWorkingHours = 0;
 
-                    work_data.reverse();
                     work_data.forEach((datum) => {
                         workingHours[datum.date.getDate()-1] = timeToFloat(datum.working_hours);
                         totalWorkingHours += timeToFloat(datum.working_hours);
                     })
-                    work_data.reverse();
 
                     averageWorkingHours = 0;
                     if (work_data.length > 0) {
@@ -341,7 +328,7 @@
                 </div>
 
                 <ul id="table-body">
-                    <% work_data.forEach((datum) => { 
+                    <% 
                         function twoDigit(num) {
                             let ret;
                             if( num < 10 ) 
@@ -350,12 +337,14 @@
                                 ret = num; 
                             return ret;
                         }
-                        let date = datum.date;
-                        let year  =          date.getFullYear();
-                        let month = twoDigit(date.getMonth() + 1);
-                        let day   = twoDigit(date.getDate());
-                        let date_string = year + "/" + month + "/" + day;
-                        if (datum.username === locals.username) { %>
+
+                        work_data.forEach((datum) => { 
+                            let date = datum.date;
+                            let year  =          date.getFullYear();
+                            let month = twoDigit(date.getMonth() + 1);
+                            let day   = twoDigit(date.getDate());
+                            let date_string = year + "/" + month + "/" + day;
+                            if (datum.username === locals.username) { %>
                             <li>
                                 <span class="day-column">
                                     <%= date_string %>
